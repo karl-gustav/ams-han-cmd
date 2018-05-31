@@ -1,0 +1,6 @@
+[submodule "vendor/github.com/goburrow/serial"]
+	path = vendor/github.com/goburrow/serial
+	url = git@github.com:goburrow/serial.git
+[submodule "vendor/github.com/karl-gustav/ams-han"]
+	path = vendor/github.com/karl-gustav/ams-han
+	url = git@github.com:karl-gustav/ams-han.git
