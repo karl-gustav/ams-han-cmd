@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	ams "bitbucket.org/karlgustav/ams-han-mbus"
 	"github.com/goburrow/serial"
+	ams "github.com/karl-gustav/ams-han"
 )
 
 var (
@@ -37,20 +37,29 @@ func main() {
 	}
 	serialPort := getSerialPort(address, baudrate, databits, stopbits, parity)
 	byteStream := createByteStream(serialPort)
-	bytePackages := ams.ByteReader(byteStream)
+
+	bytePackages, errors := ams.ByteReader(byteStream)
+
 	if verbose {
 		bytePackages = channelLogger(bytePackages)
 	}
-	messages := ams.ByteParser(bytePackages)
+
+	printErrors(errors)
+	messages, errors := ams.ByteParser(bytePackages)
+	printErrors(errors)
 
 	for message := range messages {
-		if message.Error != nil {
-			fmt.Println("[ERROR]", message.Error)
-		} else {
-			jsonString, _ := json.Marshal(message.Data)
-			fmt.Printf("%s\n", jsonString)
-		}
+		jsonString, _ := json.Marshal(message)
+		fmt.Printf("%s\n", jsonString)
 	}
+}
+
+func printErrors(errors chan error) {
+	go func() {
+		for err := range errors {
+			fmt.Println("[ERROR]", err)
+		}
+	}()
 }
 
 func getSerialPort(Address string, BaudRate int, DataBits int, StopBits int, Parity string) (port serial.Port) {
