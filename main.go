@@ -24,7 +24,7 @@ var (
 )
 
 func main() {
-	flag.StringVar(&address, "a", "/dev/ttyUSB2", "address")
+	flag.StringVar(&address, "a", "/dev/ttyUSB0", "address")
 	flag.IntVar(&baudrate, "b", 2400, "baud rate")
 	flag.IntVar(&databits, "d", 8, "data bits")
 	flag.IntVar(&stopbits, "s", 1, "stop bits")
