@@ -38,28 +38,29 @@ func main() {
 	serialPort := getSerialPort(address, baudrate, databits, stopbits, parity)
 	byteStream := createByteStream(serialPort)
 
-	bytePackages, errors := ams.ByteReader(byteStream)
+	next := ams.ByteReader(byteStream)
+	for {
+		bytePackage, err := next()
+		if err != nil {
+			fmt.Println("[ERROR]", err)
+			if err == ams.CHANNEL_IS_CLOSED_ERROR {
+				return
+			}
+			continue
+		}
 
-	if verbose {
-		bytePackages = channelLogger(bytePackages)
-	}
+		if verbose {
+			fmt.Printf("\nBuffer(%d):\n%s\n", len(bytePackage), byteArrayToHexStringArray(bytePackage))
+		}
 
-	printErrors(errors)
-	messages, errors := ams.ByteParser(bytePackages)
-	printErrors(errors)
-
-	for message := range messages {
+		message, err := ams.BytesParser(bytePackage)
+		if err != nil {
+			fmt.Println("[ERROR]", err)
+			continue
+		}
 		jsonString, _ := json.Marshal(message)
 		fmt.Printf("%s\n", jsonString)
 	}
-}
-
-func printErrors(errors chan error) {
-	go func() {
-		for err := range errors {
-			fmt.Println("[ERROR]", err)
-		}
-	}()
 }
 
 func getSerialPort(Address string, BaudRate int, DataBits int, StopBits int, Parity string) (port serial.Port) {
@@ -105,27 +106,18 @@ func createByteStream(port serial.Port) chan byte {
 
 		err := port.Close()
 		log.Println("Closed connection!")
+		close(serialChannel)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 	}()
 	return serialChannel
 }
 
-func channelLogger(in chan []byte) chan []byte {
-	out := make(chan []byte)
-	go func() {
-		for bytes := range in {
-			fmt.Printf("\nBuffer(%d): \n[%s]\n", len(bytes), strings.Join(byteArrayToHexStringArray(bytes), ", "))
-			out <- bytes
-		}
-	}()
-	return out
-}
-
-func byteArrayToHexStringArray(bytes []byte) (strings []string) {
+func byteArrayToHexStringArray(bytes []byte) string {
+	var bytesAsString []string
 	for _, b := range bytes {
-		strings = append(strings, fmt.Sprintf("0x%02x", b))
+		bytesAsString = append(bytesAsString, fmt.Sprintf("0x%02x", b))
 	}
-	return
+	return fmt.Sprintf("[%s]", strings.Join(bytesAsString, ", "))
 }
