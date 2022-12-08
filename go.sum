@@ -1,0 +1,4 @@
+github.com/goburrow/serial v0.1.0 h1:v2T1SQa/dlUqQiYIT8+Cu7YolfqAi3K96UmhwYyuSrA=
+github.com/goburrow/serial v0.1.0/go.mod h1:sAiqG0nRVswsm1C97xsttiYCzSLBmUZ/VSlVLZJ8haA=
+github.com/karl-gustav/ams-han v0.0.0-20211215070338-659a7e28dfbd h1:aQoXSmhhHm7aNBzuaNMW9qYQmM+YaswHRzqsHinsdFs=
+github.com/karl-gustav/ams-han v0.0.0-20211215070338-659a7e28dfbd/go.mod h1:ZsVspJatbX/dKg5PJ20NpbmTqgz8+rDYAmDA2o1nLUM=

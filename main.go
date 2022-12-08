@@ -24,7 +24,7 @@ var (
 )
 
 func main() {
-	flag.StringVar(&address, "a", "/dev/ttyUSB0", "address")
+	flag.StringVar(&address, "a", "", "address")
 	flag.IntVar(&baudrate, "b", 2400, "baud rate")
 	flag.IntVar(&databits, "d", 8, "data bits")
 	flag.IntVar(&stopbits, "s", 1, "stop bits")
@@ -32,7 +32,12 @@ func main() {
 	flag.BoolVar(&verbose, "v", false, "verbose output")
 	flag.Parse()
 
-	if verbose == true {
+	if address == "" {
+		fmt.Printf("the -a argument is required, should be the address of the mbus serial device, ex. /dev/ttyUSB0 or /dev/ttyAMA0")
+		return
+	}
+
+	if verbose {
 		os.Setenv("DEBUG", "DEBUG")
 	}
 	serialPort := getSerialPort(address, baudrate, databits, stopbits, parity)
